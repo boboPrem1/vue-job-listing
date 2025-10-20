@@ -1,6 +1,6 @@
 import "./assets/main.css";
 import "primeicons/primeicons.css";
-import router from "./router";
+import router from "./";
 
 import { createApp } from "vue";
 import App from "./App.vue";
