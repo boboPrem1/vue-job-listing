@@ -43,7 +43,7 @@ onMounted(async () => {
 
             <!-- Show data only when data is ready -->
             <div v-else class="grid gris-cols-1 md:grid-cols-3 gap-6">
-                <JobListing v-for="job in state.jobs.slice(0, limit || state.jobs.length)" :key="job.id" :job="job" />
+                <JobListing v-for="job in state.jobs" :key="job.id" :job="job" />
             </div>
         </div>
     </section>
