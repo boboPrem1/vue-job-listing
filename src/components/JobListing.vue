@@ -33,10 +33,9 @@ const toggleFullDescription = () => {
             </div>
 
             <div class="mb-5">
-                <div>{{ job.description }}</div>
-                <!-- <div>{{ truncatedDescription }}</div> -->
-                <!-- <button class="text-green-500 hover:text-green-600" @click="toggleFullDescription">{{
-                    showFullDescription ? 'Show less' : 'Show more' }}</button> -->
+                <div>{{ truncatedDescription }}</div>
+                <button class="text-green-500 hover:text-green-600" @click="toggleFullDescription">{{
+                    showFullDescription ? 'Show less' : 'Show more' }}</button>
             </div>
 
             <h3 class="text-green-500 mb-2">{{ job.salary }} / Year</h3>
