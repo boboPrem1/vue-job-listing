@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "start": "concurrently 'vite' 'json-server --watch src/jobs.json --port 8000'",
     "build": "vite build",
     "preview": "vite preview",
     "server": "json-server --watch src/jobs.json --port 8000"
@@ -15,6 +16,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "axios": "^1.12.2",
+    "concurrently": "^9.2.1",
     "json-server": "1.0.0-beta.3",
     "primeicons": "^7.0.0",
     "tailwindcss": "^4.1.14",
