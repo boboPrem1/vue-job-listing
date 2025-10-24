@@ -1,38 +1,169 @@
-# vue-crash-course
+---
 
-This template should help get you started developing with Vue 3 in Vite.
+## Make Your Data Work in Production with Vercel Serverless Functions
 
-## Recommended IDE Setup
+### 📁 Folder Structure
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Create the following structure:
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
+```
+/api/jobs
+  ├── index.js     → handles /api/jobs
+  └── [id].js      → handles /api/jobs/{id}
 ```
 
-### Compile and Hot-Reload for Development
+---
 
-```sh
-pnpm dev
+### ⚙ Update `vite.config.js`
+
+```js
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import tailwindcss from '@tailwindcss/vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    vueDevTools(),
+    tailwindcss(),
+  ],
+  server: {
+    port: 3000
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    },
+  },
+})
 ```
 
-### Compile and Minify for Production
+Remove any proxy configuration — it’s not needed anymore.
 
-```sh
-pnpm build
+---
+
+###  `/api/jobs/index.js`
+
+```js
+import fs from 'fs';
+import path from 'path';
+
+const filePath = path.join(process.cwd(), 'src', 'jobs.json');
+
+export default async function handler(req, res) { 
+  const method = req.method; 
+
+  let body = {}; 
+  if (method === 'POST') { 
+    try {
+      const chunks = []; 
+      for await (const chunk of req) chunks.push(chunk); 
+      body = JSON.parse(Buffer.concat(chunks).toString()); 
+    } catch(err) { 
+      return res.status(400).json({ message: 'Invalid JSON body' }); 
+    } 
+  } 
+
+  if (method === 'GET') { 
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8')); 
+    return res.status(200).json(data.jobs); 
+  } 
+
+  if (method === 'POST') { 
+    const newJob = body; 
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8')); 
+
+    newJob.id = Date.now(); 
+    data.jobs.push(newJob); 
+
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); 
+    return res.status(201).json(newJob); 
+  } 
+
+  res.setHeader('Allow', ['GET', 'POST']); 
+  res.status(405).end(`Method ${method} not allowed`);
+}
 ```
+
+---
+
+###  `/api/jobs/[id].js`
+
+```js
+import fs from 'fs';
+import path from 'path';
+
+const filePath = path.join(process.cwd(), 'src', 'jobs.json');
+
+export default async function handler(req, res) { 
+  const { id } = req.query; 
+  const method = req.method; 
+
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8')); 
+  const jobs = data.jobs || []; 
+
+  let body = {}; 
+  if (method === 'PUT') { 
+    try { 
+      const chunks = []; 
+      for await (const chunk of req) chunks.push(chunk); 
+      body = JSON.parse(Buffer.concat(chunks).toString()); 
+    } catch(err) { 
+      return res.status(400).json({ message: 'Invalid JSON body' }); 
+    } 
+  } 
+
+  const jobIndex = jobs.findIndex((job) => job.id == id); 
+
+  if (method === 'GET') { 
+    const job = jobs.find((job) => job.id == id); 
+    if (!job) return res.status(404).json({ message: 'Job not found' }); 
+    return res.status(200).json(job); 
+  } 
+
+  if (method === 'PUT') { 
+    if (jobIndex === -1) return res.status(404).json({ message: 'Job not found' }); 
+    jobs[jobIndex] = { ...jobs[jobIndex], ...body }; 
+    fs.writeFileSync(filePath, JSON.stringify({ jobs }, null, 2)); 
+    return res.status(200).json(jobs[jobIndex]); 
+  } 
+
+  if (method === 'DELETE') { 
+    if (jobIndex === -1) return res.status(404).json({ message: 'Job not found' }); 
+    const deleted = jobs.splice(jobIndex, 1); 
+    fs.writeFileSync(filePath, JSON.stringify({ jobs }, null, 2));
+    return res.status(200).json(deleted[0]);
+  }
+
+  res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+  res.status(405).end(`Method ${method} not allowed`);
+}
+```
+
+---
+
+### ☁ Deployment
+
+To make this work:
+
+1. Deploy your project on Vercel,  (not Netlify).
+2. Vercel automatically treats everything in the `/api` folder as  Serverless Functions.
+3. Each file inside `/api` becomes an accessible endpoint:
+
+   * `/api/jobs`
+   * `/api/jobs/{id}`
+
+📚 Documentation: https://vercel.com/docs/functions
+
+---
+
+### ⭐ Support the Project
+
+If this helped you, drop a ⭐ on
+👉 https://github.com/boboPrem1/vue-job-listing
+👉 https://github.com/boboPrem1
+
+(after the https://github.com/bradtraversy repo, of course 😉)
