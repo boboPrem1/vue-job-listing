@@ -62,7 +62,7 @@ const closeModal = () => {
   <!-- ✅ MODAL -->
   <div
     v-if="isModalOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
   >
     <div class="bg-white rounded-xl shadow-lg max-w-lg w-full mx-4 p-6 relative animate-fade-in">
       <button
