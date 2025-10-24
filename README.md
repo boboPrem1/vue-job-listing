@@ -1,10 +1,10 @@
 ---
 
-## Make Your Data Work in Production with Vercel Serverless Functions
+## 🚀 Make Your Data Work in Production with Vercel Serverless Functions
 
 ### 📁 Folder Structure
 
-Create the following structure:
+Create the following structure
 
 ```
 /api/jobs
@@ -14,7 +14,7 @@ Create the following structure:
 
 ---
 
-### ⚙ Update `vite.config.js`
+### ⚙️ Update `vite.config.js`
 
 ```js
 import { fileURLToPath, URL } from 'node:url'
@@ -41,11 +41,11 @@ export default defineConfig({
 })
 ```
 
-Remove any proxy configuration — it’s not needed anymore.
+🧹 Remove any proxy configuration — it’s not needed anymore.
 
 ---
 
-###  `/api/jobs/index.js`
+### 📦 `/api/jobs/index.js`
 
 ```js
 import fs from 'fs';
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
 
 ---
 
-###  `/api/jobs/[id].js`
+### 📦 `/api/jobs/[id].js`
 
 ```js
 import fs from 'fs';
@@ -145,25 +145,24 @@ export default async function handler(req, res) {
 
 ---
 
-### ☁ Deployment
+### ☁️ Deployment
 
-To make this work:
+To make this work
 
-1. Deploy your project on Vercel,  (not Netlify).
-2. Vercel automatically treats everything in the `/api` folder as  Serverless Functions.
-3. Each file inside `/api` becomes an accessible endpoint:
+1. Deploy your project on **Vercel** (not Netlify).
+2. Vercel automatically treats everything in the `/api` folder as **Serverless Functions**.
+3. Each file inside `/api` becomes an accessible endpoint
 
    * `/api/jobs`
    * `/api/jobs/{id}`
 
-📚 Documentation: https://vercel.com/docs/functions
+📚 Documentation: [https://vercel.com/docs/functions](https://vercel.com/docs/functions)
 
 ---
 
 ### ⭐ Support the Project
 
 If this helped you, drop a ⭐ on
-👉 https://github.com/boboPrem1/vue-job-listing
-👉 https://github.com/boboPrem1
+👉 [https://github.com/boboPrem1/vue-job-listing](https://github.com/boboPrem1/vue-job-listing)
 
-(after the https://github.com/bradtraversy repo, of course 😉)
+---
