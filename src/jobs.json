@@ -113,17 +113,31 @@
       }
     },
     {
-      "id": "f0fc",
       "type": "Full-Time",
       "title": "Full stack Software engenieer",
       "description": "We are looking for an experienced software engineer to join our team. This latter would be capable of carrying large project without any problem",
-      "salary": "$150K - $175K",
+      "salary": "Over $200K",
       "location": "Lomé, Togo",
       "company": {
-        "name": "Togocom",
+        "name": "YASS",
         "description": "We are looking for an experienced software engineer to join our team. This latter would be capable of carrying large project without any problem",
         "contactEmail": "contact.togocom@togocom.tg",
         "contactPhone": "+228 96 85 78 74"
+      },
+      "id": "f0fc"
+    },
+    {
+      "id": "f414",
+      "type": "Remote",
+      "title": "CTO Fullstack Developper",
+      "description": "We're looking for an experienced developer, he will be responsible of leading our dynamic team of junior developers in order to fulfill jobs gave by the CEO.",
+      "salary": "$175K - $200K",
+      "location": "Paris, France",
+      "company": {
+        "name": "Google",
+        "description": "Google\nest une multinationale américaine fondée en 1998 par Larry Page et Sergey Brin, principalement connue pour son moteur de recherche. L'entreprise est aujourd'hui une filiale de la société mère Alphabet, Inc. et propose une vaste gamme de produits technologiques, incluant le système d'exploitation mobile Android, le navigateur Chrome, des services de cloud computing et de publicité en ligne, ainsi que des outils d'intelligence artificielle.",
+        "contactEmail": "contact@google.com",
+        "contactPhone": "+1 2563 256 5478"
       }
     }
   ]

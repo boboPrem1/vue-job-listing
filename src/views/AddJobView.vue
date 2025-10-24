@@ -7,14 +7,15 @@ import { useToast } from 'vue-toastification'
 
 const route = useRoute()
 
-const {job, editing} = defineProps({
+const { job, editing, allo } = defineProps({
     job: {
-        type: {Object}
+        type: { Object }
     },
     editing: {
         type: Boolean,
         default: false
-    }
+    },
+    allo: String
 })
 
 
@@ -36,51 +37,45 @@ let form = reactive({
 
 const toast = useToast();
 
-const handleAddSubmit = async () => {
-    const newJob = {
-        ...form
-    };
+const handleSubmit = async () => {
+    if (!editing) {
+        const newJob = {
+            ...form
+        };
 
-    try {
-        const response = await axios.post('/api/jobs', newJob);
-        toast.success("Job added successfully !")
-        router.push(`/jobs/${response.data.id}`)
-    } catch (error) {
-        console.error("Error creating a new job", error)
-        toast.error("Something whent wrong ...")
-    }
-}
-
-const handleEditSubmit = async () => {
-    try {
-        const response = await axios.put(`/api/jobs/${jobId.value}`, { ...form });
-        toast.success("Job eddited successfully !")
-        router.push(`/jobs/${response.data.id}`)
-    } catch (error) {
-        console.error("Error editing a new job", error)
-        toast.error("Something whent wrong ...")
+        try {
+            const response = await axios.post('/api/jobs', newJob);
+            toast.success("Job added successfully !")
+            router.push(`/jobs/${response.data.id}`)
+        } catch (error) {
+            console.error("Error creating a new job", error)
+            toast.error("Something whent wrong ...")
+        }
+    } else {
+        try {
+            const response = await axios.put(`/api/jobs/${jobId.value}`, { ...form });
+            toast.success("Job eddited successfully !")
+            router.push(`/jobs/${response.data.id}`)
+        } catch (error) {
+            console.error("Error editing a new job", error)
+            toast.error("Something whent wrong ...")
+        }
     }
 }
 
 onMounted(async () => {
-
-console.log(job)
     try {
         jobId.value = job.id
         if (editing && job) {
-            form = {
-                type: job.type,
-                title: job.title,
-                description: job.description,
-                salary: job.salary,
-                location: job.location,
-                company: {
-                    name: job.company.name,
-                    description: job.company.description,
-                    contactEmail: job.company.contactEmail,
-                    contactPhone: job.company.contactPhone
-                }
-            }
+            form.type = job.type,
+                form.title = job.title,
+                form.description = job.description,
+                form.salary = job.salary,
+                form.location = job.location,
+                form.company.name = job.company.name,
+                form.company.description = job.company.description,
+                form.company.contactEmail = job.company.contactEmail,
+                form.company.contactPhone = job.company.contactPhone
         }
     } catch (error) {
         console.error("Error got when fetching job data : ", error)
@@ -92,8 +87,8 @@ console.log(job)
     <section class="bg-green-50">
         <div class="container m-auto max-w-2xl py-24">
             <div class="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
-                <form @submit.prevent="handleAddSubmit">
-                    <h2 class="text-3xl text-center font-semibold mb-6">Add Job</h2>
+                <form @submit.prevent="handleSubmit">
+                    <h2 class="text-3xl text-center font-semibold mb-6">{{ !editing ? "Add" : "Update" }} Job</h2>
 
                     <div class="mb-4">
                         <label for="type" class="block text-gray-700 font-bold mb-2">Job Type</label>
@@ -177,7 +172,7 @@ console.log(job)
                         <button
                             class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
                             type="submit">
-                            Add Job
+                            {{ !editing ? "Add" : "Update" }} Job
                         </button>
                     </div>
                 </form>

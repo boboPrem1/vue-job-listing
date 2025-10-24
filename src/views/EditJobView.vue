@@ -8,13 +8,15 @@ const route = useRoute()
 
 const jobId = route.params.id
 
-const job = ref(null)
+let job = {}
+let loading = ref(true)
 
 onMounted(async () => {
     try {
         const response = await axios.get(`/api/jobs/${jobId}`)
 
-        job.value = response.data
+        job = { ...response.data }
+        loading.value = false
         // console.log(jobId)
     } catch (error) {
         console.error("Error got when fetching job data : ", error)
@@ -23,7 +25,5 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AddJobView v-if="job" :editing="true" :job="job" />
-
-    <!-- <AddJobView :editing="true" :job="job.value" /> -->
+    <AddJobView v-if="!loading" :editing="true" :job="job" :allo="`Allo`" />
 </template>
