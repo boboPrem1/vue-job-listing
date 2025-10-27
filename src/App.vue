@@ -1,9 +1,10 @@
 <script setup>
-import Navbar from '@/components/Navbar.vue';
+import GlobalTemplate from '@/components/GlobalTemplate.vue';
 import { RouterView } from 'vue-router';
 </script>
 
 <template>
-    <Navbar />
-    <RouterView />
+    <GlobalTemplate>
+        <RouterView />
+    </GlobalTemplate>
 </template>

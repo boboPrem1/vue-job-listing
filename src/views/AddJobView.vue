@@ -118,7 +118,7 @@ onMounted(async () => {
                         <label for="type" class="block text-gray-700 font-bold mb-2">Salary</label>
                         <select v-model="form.salary" id="salary" name="salary" class="border rounded w-full py-2 px-3"
                             required>
-                            <option value="Under $50K">under $50K</option>
+                            <option value="Under $50K">Under $50K</option>
                             <option value="$50K - $60K">$50 - $60K</option>
                             <option value="$60K - $70K">$60 - $70K</option>
                             <option value="$70K - $80K">$70 - $80K</option>

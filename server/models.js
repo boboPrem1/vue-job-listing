@@ -21,7 +21,15 @@ export const User = sequelize.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false
-    }
+    },
+    role: {
+        type: DataTypes.ENUM(
+            'viewer',
+            'editor',
+            'admin'),
+        defaultValue: 'Full-Time',
+        allowNull: false
+    },
 });
 
 export const Company = sequelize.define('Company', {
