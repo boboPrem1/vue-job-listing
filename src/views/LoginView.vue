@@ -4,6 +4,7 @@ import axios from "axios"
 import router from "@/router"
 import { useRoute } from "vue-router"
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from "@/stores/auth"
 
 const route = useRoute()
 
@@ -16,6 +17,8 @@ let form = reactive({
 const loginType = ref('username');
 
 const toast = useToast();
+
+const authStore = useAuthStore();
 
 const switchloginType = () => {
     loginType.value = loginType.value === 'email' ? 'username' : 'email'
@@ -32,11 +35,12 @@ const handleSubmit = async () => {
 
     try {
         const response = await axios.post('/api/auth/login', loginData);
+        authStore.login(response.data.user)
         toast.success(response.data.message)
         router.push(`/jobs`)
     } catch (error) {
         console.error("Login error", error)
-        toast.error("Something whent wrong ...")
+        toast.error(`Something whent wrong, ${error.response.data.message}`)
     }
 }
 

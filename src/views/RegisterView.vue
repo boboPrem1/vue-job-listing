@@ -5,6 +5,7 @@ import router from "@/router"
 import { useRoute } from "vue-router"
 import { useToast } from 'vue-toastification'
 import { RouterLink } from "vue-router"
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 
@@ -20,18 +21,22 @@ let form = reactive({
 
 const toast = useToast();
 
+const authStore = useAuthStore();
+
 const handleSubmit = async () => {
+    delete form.confirmPassword;
     const loginData = {
         ...form
     };
 
     try {
-        const response = await axios.post('/api/auth/login', loginData);
+        const response = await axios.post('/api/auth/register', loginData);
+        authStore.login(response.data.user)
         toast.success("You've been logged successfully !")
-        router.push(`/jobs/${response.data.id}`)
+        router.push(`/jobs`)
     } catch (error) {
         console.error("Login error", error)
-        toast.error("Something whent wrong ...")
+        toast.error(`Something whent wrong, ${error.response.data.message}`)
     }
 }
 
@@ -63,7 +68,8 @@ const handleSubmit = async () => {
                     <h2 class="text-3xl text-center font-semibold mb-6">Register a new account</h2>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 font-medium mb-2">Firstname <span class="text-red-500">*</span></label>
+                        <label class="block text-gray-700 font-medium mb-2">Firstname <span
+                                class="text-red-500">*</span></label>
                         <input v-model="form.firstname" type="text" id="firstname" name="firstname"
                             class="border rounded w-full py-2 px-3 mb-2" placeholder="Jane" required />
                     </div>
@@ -75,7 +81,8 @@ const handleSubmit = async () => {
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 font-medium mb-2">Email <span class="text-red-500">*</span></label>
+                        <label class="block text-gray-700 font-medium mb-2">Email <span
+                                class="text-red-500">*</span></label>
                         <input v-model="form.email" type="email" id="email" name="email"
                             class="border rounded w-full py-2 px-3 mb-2" placeholder="jane.doe@gmail.com" required />
                     </div>
@@ -87,15 +94,18 @@ const handleSubmit = async () => {
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 font-medium mb-2">Password <span class="text-red-500">*</span></label>
+                        <label class="block text-gray-700 font-medium mb-2">Password <span
+                                class="text-red-500">*</span></label>
                         <input v-model="form.password" type="password" id="password" name="password"
                             class="border rounded w-full py-2 px-3 mb-2" placeholder="********" required />
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-gray-700 font-medium mb-2">Confirm your password <span class="text-red-500">*</span></label>
-                        <input v-model="form.confirmPassword" type="password" id="confirmPassword" name="confirmPassword"
-                            class="border rounded w-full py-2 px-3 mb-2" placeholder="********" required />
+                        <label class="block text-gray-700 font-medium mb-2">Confirm your password <span
+                                class="text-red-500">*</span></label>
+                        <input v-model="form.confirmPassword" type="password" id="confirmPassword"
+                            name="confirmPassword" class="border rounded w-full py-2 px-3 mb-2" placeholder="********"
+                            required />
                     </div>
 
                     <div>
@@ -107,7 +117,9 @@ const handleSubmit = async () => {
                     </div>
                 </form>
                 <div class="mt-3">
-                    Already have an account ? <RouterLink class="text-green-500 hover:text-green-400 active:text-green-600 visited:text-green-700" to="/login">Login</RouterLink>
+                    Already have an account ? <RouterLink
+                        class="text-green-500 hover:text-green-400 active:text-green-600 visited:text-green-700"
+                        to="/login">Login</RouterLink>
                 </div>
             </div>
         </div>

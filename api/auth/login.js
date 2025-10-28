@@ -1,6 +1,7 @@
 import { initDatabase } from "../../server/init.js";
 import { User } from "../../server/models.js";
-import argon2 from "argon2";
+import jwt from "jsonwebtoken";
+import { scryptSync, randomBytes, timingSafeEqual } from "crypto";
 
 const GET = "GET";
 const PUT = "PUT";
@@ -25,10 +26,14 @@ export default async function handler(req, res) {
 
   const user = body.username
     ? await User.findOne({
-        username: body.username,
+        where: {
+          username: body.username,
+        },
       })
     : await User.findOne({
-        email: body.email,
+        where: {
+          email: body.email,
+        },
       });
 
   if (!user)
@@ -36,9 +41,16 @@ export default async function handler(req, res) {
       message: "Utilisateur non trouvé !",
     });
 
-  const password_is_valid = await argon2.verify(user.password, body.password);
+  // Vérification
+  const [salt2, key2] = user.password.split(":");
+  const hashedBuffer = scryptSync(body.password, salt2, 64);
+  const keyBuffer = Buffer.from(key2, "hex");
 
-  if (password_is_valid) {
+  const match = timingSafeEqual(hashedBuffer, keyBuffer);
+
+  // const password_is_valid = await argon2.verify(user.password, body.password);
+
+  if (match) {
     // Log user in
     const token = jwt.sign(
       { id: user.id, email: user.email },
@@ -49,6 +61,14 @@ export default async function handler(req, res) {
     return res.status(200).json({
       message: "Authentification réussie",
       token,
+      user: {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
   } else {
     return res.status(401).json({

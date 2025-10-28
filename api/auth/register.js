@@ -2,6 +2,7 @@ import { initDatabase } from "../../server/init.js";
 import { Job, Company, User } from "../../server/models.js";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
+import { scryptSync, randomBytes, timingSafeEqual } from "crypto";
 
 export default async function handler(req, res) {
   await initDatabase(); // assure la connexion (et crée les tables une fois)
@@ -21,9 +22,9 @@ export default async function handler(req, res) {
   }
 
   const existingUser = await User.findOne({
-    firstname: body.firstname,
-    lastname: body.lastname,
-    email: body.email,
+    where: {
+      email: body.email,
+    },
   });
 
   if (existingUser) {
@@ -34,12 +35,15 @@ export default async function handler(req, res) {
 
   // Let's hach the password
   // Hachage
-  const hash = await argon2.hash("", {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16, // mémoire utilisée
-    timeCost: 5, // nombre d’itérations
-    parallelism: 1, // nombre de threads
-  });
+  const salt = randomBytes(16).toString("hex");
+  const hashed = scryptSync(body.password, salt, 64).toString("hex");
+  const hash = `${salt}:${hashed}`;
+  // const hash = await argon2.hash("", {
+  //   type: argon2.argon2id,
+  //   memoryCost: 2 ** 16, // mémoire utilisée
+  //   timeCost: 5, // nombre d’itérations
+  //   parallelism: 1, // nombre de threads
+  // });
 
   const newUser = {
     ...body,
@@ -48,7 +52,7 @@ export default async function handler(req, res) {
   };
 
   // Creating and connecting the new user
-  const usercreated = User.create(newUser);
+  const usercreated = await User.create(newUser);
 
   // Log user in
   const token = jwt.sign(
@@ -60,5 +64,13 @@ export default async function handler(req, res) {
   return res.status(200).json({
     message: "Authentification réussie",
     token,
+    user: {
+      id: usercreated.id,
+      firstname: usercreated.firstname,
+      lastname: usercreated.lastname,
+      username: usercreated.username,
+      email: usercreated.email,
+      role: usercreated.role,
+    },
   });
 }
