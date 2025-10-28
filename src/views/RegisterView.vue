@@ -42,7 +42,7 @@ const handleSubmit = async () => {
 
 // onMounted(async () => {
 //     try {
-//         jobId.value = job.id
+//         jobId.value = job._id
 //         if (editing && job) {
 //             form.type = job.type,
 //                 form.title = job.title,

@@ -6,6 +6,7 @@ import axios from "axios"
 import { useRoute, RouterLink } from "vue-router"
 import { useToast } from 'vue-toastification'
 import router from '@/router'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 
@@ -17,6 +18,8 @@ const state = reactive({
 })
 
 const toast = useToast();
+
+const authStore = useAuthStore()
 
 const deleteJob = async (job_id) => {
   try {
@@ -105,13 +108,13 @@ onMounted(async () => {
           </div>
 
           <!-- Manage -->
-          <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+          <div v-if="authStore.user.role != 'viewer'" class="bg-white p-6 rounded-lg shadow-md mt-6">
             <h3 class="text-xl font-bold mb-6">Manage Job</h3>
-            <RouterLink :to="`/jobs/edit/${state.job.id}`"
+            <RouterLink v-if="authStore.user.role === 'editor' || authStore.user.role === 'admin'" :to="`/jobs/edit/${state.job._id}`"
               class="bg-green-500 hover:bg-green-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
               Edit
               Job</RouterLink>
-            <button @click="deleteJob(state.job.id)"
+            <button v-if="authStore.user.role === 'admin'" @click="deleteJob(state.job._id)"
               class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
               Delete Job
             </button>

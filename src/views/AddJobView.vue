@@ -1,9 +1,10 @@
 <script setup>
-import { reactive, onMounted, ref } from "vue"
+import { reactive, onMounted, ref, onBeforeMount } from "vue"
 import axios from "axios"
 import router from "@/router"
 import { useRoute } from "vue-router"
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from "@/stores/auth"
 
 const route = useRoute()
 
@@ -46,7 +47,7 @@ const handleSubmit = async () => {
         try {
             const response = await axios.post('/api/jobs', newJob);
             toast.success("Job added successfully !")
-            router.push(`/jobs/${response.data.id}`)
+            router.push(`/jobs/${response.data._id}`)
         } catch (error) {
             console.error("Error creating a new job", error)
             toast.error("Something whent wrong ...")
@@ -55,7 +56,7 @@ const handleSubmit = async () => {
         try {
             const response = await axios.put(`/api/jobs/${jobId.value}`, { ...form });
             toast.success("Job eddited successfully !")
-            router.push(`/jobs/${response.data.id}`)
+            router.push(`/jobs/${response.data._id}`)
         } catch (error) {
             console.error("Error editing a new job", error)
             toast.error("Something whent wrong ...")
@@ -63,9 +64,17 @@ const handleSubmit = async () => {
     }
 }
 
+onBeforeMount(() => {
+    const authStore = useAuthStore()
+
+    if(!authStore.isAuthenticated || !(authStore.user.role === 'editor' || authStore.user.role === 'admin')){
+        router.replace('/')
+    }
+})
+
 onMounted(async () => {
     try {
-        jobId.value = job.id
+        jobId.value = job._id
         if (editing && job) {
             form.type = job.type,
                 form.title = job.title,

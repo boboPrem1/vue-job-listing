@@ -1,8 +1,10 @@
 <script setup>
 import AddJobView from "./AddJobView.vue"
 import { useRoute } from "vue-router"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, onBeforeMount } from "vue"
 import axios from "axios"
+import { useAuthStore } from "@/stores/auth"
+import router from '@/router'
 
 const route = useRoute()
 
@@ -10,6 +12,13 @@ const jobId = route.params.id
 
 let job = {}
 let loading = ref(true)
+onBeforeMount(() => {
+    const authStore = useAuthStore()
+
+    if (!authStore.isAuthenticated || !(authStore.user.role === 'editor' || authStore.user.role === 'admin')) {
+        router.replace('/')
+    }
+})
 
 onMounted(async () => {
     try {

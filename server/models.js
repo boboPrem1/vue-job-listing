@@ -1,100 +1,74 @@
-import sequelize from './db.js';
-import { DataTypes } from 'sequelize';
+// server/models.js
+import mongoose from "mongoose";
 
-export const User = sequelize.define('User', {
-    firstname: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    lastname: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    username: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+const { Schema, model, models } = mongoose;
+
+const userSchema = new Schema(
+  {
+    firstname: { type: String, default: null },
+    lastname: { type: String, default: null },
+    username: { type: String, default: null },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     role: {
-        type: DataTypes.ENUM(
-            'viewer',
-            'editor',
-            'admin'),
-        defaultValue: 'Full-Time',
-        allowNull: false
+      type: String,
+      enum: ["viewer", "editor", "admin"],
+      default: "viewer", // 🔹 Corrigé: tu avais "Full-Time" qui n'existe pas dans l'enum
     },
-});
+  },
+  {
+    timestamps: true, // crée automatiquement createdAt et updatedAt
+  }
+);
 
-export const Company = sequelize.define('Company', {
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    description: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    contactEmail: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    contactPhone: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-});
+const companySchema = new Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, default: null },
+    contactEmail: { type: String, required: true },
+    contactPhone: { type: String, default: null },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export const Job = sequelize.define('Job', {
+const jobSchema = new Schema(
+  {
     type: {
-        type: DataTypes.ENUM(
-            'Full-Time',
-            'Part-Time',
-            'Remote',
-            'Internship'),
-        defaultValue: 'Full-Time',
-        allowNull: false
+      type: String,
+      enum: ["Full-Time", "Part-Time", "Remote", "Internship"],
+      default: "Full-Time",
     },
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    description: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
     salary: {
-        type: DataTypes.ENUM(
-            'Under $50K',
-            '$50K - $60K',
-            '$60K - $70K',
-            '$70K - $80K',
-            '$80K - $90K',
-            '$90K - $100K',
-            '$100K - $125K',
-            '$125K - $150K',
-            '$150K - $175K',
-            '$175K - $200K',
-            'Over $200K'),
-        allowNull: true
+      type: String,
+      enum: [
+        "Under $50K",
+        "$50K - $60K",
+        "$60K - $70K",
+        "$70K - $80K",
+        "$80K - $90K",
+        "$90K - $100K",
+        "$100K - $125K",
+        "$125K - $150K",
+        "$150K - $175K",
+        "$175K - $200K",
+        "Over $200K",
+      ],
+      default: null,
     },
-    location: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-})
+    location: { type: String, required: true },
+    company: { type: Schema.Types.ObjectId, ref: "Company" },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-Company.hasMany(Job, { foreignKey: 'companyId', as: 'jobs' });
-Job.belongsTo(Company, { foreignKey: 'companyId', as: 'company' });
-
-User.hasMany(Job, { foreignKey: 'userId' });
-Job.belongsTo(User, { foreignKey: 'userId' });
-
-User.hasMany(Company, { foreignKey: 'userId' });
-Company.belongsTo(User, { foreignKey: 'userId' });
+export const User = models.User || model("User", userSchema);
+export const Company = models.Company || model("Company", companySchema);
+export const Job = models.Job || model("Job", jobSchema);

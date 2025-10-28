@@ -8,7 +8,7 @@ const PUT = "PUT";
 const DELETE = "DELETE";
 
 export default async function handler(req, res) {
-  await initDatabase(); // assure la connexion (et crée les tables une fois)
+  await initDatabase(); // Connexion à mongodb
 
   const method = req.method;
   const body = req.body;
@@ -26,14 +26,10 @@ export default async function handler(req, res) {
 
   const user = body.username
     ? await User.findOne({
-        where: {
-          username: body.username,
-        },
+        username: body.username,
       })
     : await User.findOne({
-        where: {
-          email: body.email,
-        },
+        email: body.email,
       });
 
   if (!user)
@@ -53,7 +49,7 @@ export default async function handler(req, res) {
   if (match) {
     // Log user in
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user._id, email: user.email },
       process.env.JWT_SECRET, // clé secrète stockée dans les variables d'environnement Vercel
       { expiresIn: "24h" }
     );
@@ -62,7 +58,7 @@ export default async function handler(req, res) {
       message: "Authentification réussie",
       token,
       user: {
-        id: user.id,
+        _id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
         username: user.username,

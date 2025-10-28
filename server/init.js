@@ -1,13 +1,19 @@
 // /server/init.js
-import sequelize from './db.js';
-import './models.js'; // importe les modèles pour que Sequelize les connaisse
+import mongoose from "mongoose";
 
 export async function initDatabase() {
+  if (mongoose.connection.readyState >= 1) return;
+
+  const uri = process.env.MONGODB_STR_CONNECT; // on stocke la string de connexion dans les variables d'environnement Vercel
+
   try {
-    await sequelize.authenticate();
-    await sequelize.sync(); // crée les tables si elles n'existent pas
-    console.log('✅ Base de données connectée et synchronisée');
-  } catch (error) {
-    console.error('❌ Erreur de connexion à la base de données:', error);
+    await mongoose.connect(uri, {
+      dbName: "vue-jobs-app", // 👈 ton nom de base de données
+      autoIndex: true,
+    });
+    console.log("✅ Connected to MongoDB");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
+    throw err;
   }
 }

@@ -1,11 +1,11 @@
 import { initDatabase } from "../../server/init.js";
-import { Job, Company, User } from "../../server/models.js";
+import { User } from "../../server/models.js";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import { scryptSync, randomBytes, timingSafeEqual } from "crypto";
 
 export default async function handler(req, res) {
-  await initDatabase(); // assure la connexion (et crée les tables une fois)
+  await initDatabase(); // Connexion à mongodb
 
   const method = req.method;
   const body = req.body;
@@ -22,9 +22,7 @@ export default async function handler(req, res) {
   }
 
   const existingUser = await User.findOne({
-    where: {
-      email: body.email,
-    },
+    email: body.email,
   });
 
   if (existingUser) {
@@ -56,7 +54,7 @@ export default async function handler(req, res) {
 
   // Log user in
   const token = jwt.sign(
-    { id: usercreated.id, email: usercreated.email },
+    { id: usercreated._id, email: usercreated.email },
     process.env.JWT_SECRET, // clé secrète stockée dans les variables d'environnement Vercel
     { expiresIn: "24h" }
   );
@@ -65,7 +63,7 @@ export default async function handler(req, res) {
     message: "Authentification réussie",
     token,
     user: {
-      id: usercreated.id,
+      _id: usercreated._id,
       firstname: usercreated.firstname,
       lastname: usercreated.lastname,
       username: usercreated.username,
