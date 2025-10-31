@@ -1,6 +1,8 @@
 <script setup>
 import Card from '@/components/Card.vue'
 import { RouterLink } from 'vue-router';
+
+const auth = useAuthStore()
 </script>
 
 <template>
@@ -17,7 +19,7 @@ import { RouterLink } from 'vue-router';
                         Browse Jobs
                     </RouterLink>
                 </Card>
-                <Card bg="bg-green-100">
+                <Card v-if="['admin', 'editor'].includes(auth.user.role)" bg="bg-green-100">
                     <h2 class="text-2xl font-bold">For Employers</h2>
                     <p class="mt-2 mb-4">
                         List your job to find the perfect developer for the role
