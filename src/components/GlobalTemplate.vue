@@ -37,7 +37,7 @@ const handleLogout = () => {
                                 Home</RouterLink>
                             <RouterLink to="/jobs" :class="isActiveLink('/jobs')">Jobs
                             </RouterLink>
-                            <RouterLink to="/jobs/add" :class="isActiveLink('/jobs/add')">Add Job
+                            <RouterLink v-if="['admin', 'editor'].includes(auth.user.role)" to="/jobs/add" :class="isActiveLink('/jobs/add')">Add Job
                             </RouterLink>
                         </div>
                         <div v-if="auth.isAuthenticated" class="flex justify-center items-center gap-x-5">
